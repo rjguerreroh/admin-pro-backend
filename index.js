@@ -1,10 +1,9 @@
 require('dotenv').config();
 const express = require('express');
 const { dbConnection } = require('./database/config');
-const cors = require('cors')
+const cors = require('cors');
 
 /* Crear el servidor de express  */
-
 const app = express();
 
 // Configurar cors
@@ -12,6 +11,8 @@ app.use(cors());
 
 // Lectura y parseo del body
 app.use( express.json() );
+
+// Base de datos
 dbConnection();
 
 app.listen(process.env.PORT, () => {
@@ -20,8 +21,8 @@ app.listen(process.env.PORT, () => {
 
 
 /** Rutas */
-
 app.use('/api/usuarios', require('./routes/usuarios'));
+app.use('/api/login', require('./routes/auth'));
 
 app.get('/', (req, res) =>{
     res.json({
@@ -29,11 +30,3 @@ app.get('/', (req, res) =>{
         msg: 'Hola mundo'
     });
 });
-
-
-
-/**
- * pass: qDzyAdKjoBjvij6b
- * mean-user
- * mongodb+srv://username:password@cluster0-jtpxd.mongodb.net/admin
- */
