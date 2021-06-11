@@ -5,14 +5,30 @@ const { generarJWT } = require('../helpers/jwt');
 // const { response } = require('express');
 
 const getUsuarios = async (req, res) => {
-    const usuario = await Usuario.find({},'nombre email role google');
+    const desde = Number(req.query.desde || 0) ;
+    // const usuario = await Usuario
+    //     .find({},'nombre email role google')
+    //     .skip(desde)
+    //     .limit(5);
+    
+    // const total = await Usuario.count();
+
+    const [usuarios,total] =await Promise.all([
+            Usuario
+            .find({},'nombre email role google img')
+            .skip(desde)
+            .limit(5),
+        Usuario.countDocuments()
+    ]);
     res.json({
-        usuario,
-        uid: req.uid
+        ok: true,
+        usuarios,
+        total
     });
 }
 
 const crearUsuario = async (req, res) => {
+    console.log('req body', req.body);
     const { email, password, nombre} = req.body;
     try {
         const existEmail = await Usuario.findOne({ email });
