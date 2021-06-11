@@ -1,3 +1,4 @@
+const hospital = require('../models/hospital');
 const Medico = require('../models/medico');
 const getMedicos = async (req, res) => {
     const medicos = await Medico.find()
@@ -27,22 +28,63 @@ const crearMedico = async (req, res) => {
     }
 }
 
-const actualizarMedico = (req,res) => {
-    const uid = req.params.id;
-    res.json({
-        ok: true,
-        msg: 'actualizarMedico',
-        uid: uid
-    });
+const actualizarMedico = async(req,res) => {
+    const id = req.params.id;
+    const uid = req.uid;
+    try {        
+        const medico = await Medico.findById(id);
+        if(!medico) {
+            res.status(404).json({
+                ok: false,
+                msg: 'Medico no encontrado'
+            });
+        }
+    
+        const cambiosMedico = {
+            nombre: req.body.nombre,
+            usuario: uid,
+            hospital: req.body.hospital
+        }
+    
+        const medicoActualizado = await Medico.findByIdAndUpdate(id, cambiosMedico, { new: true });
+    
+        res.json({
+            ok: true,
+            medicoActualizado
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: "Ocurrio un error al actalizar"
+        });
+    }
 }
 
-const borrarMedico = (req,res) => {
-    const uid = req.params.id;
-    res.json({
-        ok: true,
-        msg: 'borrarMedico',
-        uid: uid
-    });
+const borrarMedico = async(req,res) => {
+    const id = req.params.id;
+    try {        
+        const medico = await Medico.findById(id);
+        if(!medico) {
+            res.status(404).json({
+                ok: false,
+                msg: 'Medico no encontrado'
+            });
+        }
+    
+        await Medico.findByIdAndDelete(id);
+    
+        res.json({
+            ok: true,
+            msg: 'Medico Eliminado'
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: "Ocurrio un error al Eliminar"
+        });
+    }
 }
 
 module.exports = {
